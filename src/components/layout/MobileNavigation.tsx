@@ -13,19 +13,22 @@ export function MobileNavigation() {
       label: "Home",
       icon: Home,
       href: "/",
-      active: window.location.pathname === "/"
+      active: window.location.pathname === "/",
+      disabled: false
     },
     {
       label: "Balances",
       icon: PieChart,
       href: currentGroupId ? `/groups/${currentGroupId}/balances` : "/",
-      active: window.location.pathname.includes("/balances")
+      active: window.location.pathname.includes("/balances"),
+      disabled: !currentGroupId
     },
     {
       label: "Settings",
       icon: Settings,
       href: "/settings",
-      active: window.location.pathname === "/settings"
+      active: window.location.pathname === "/settings",
+      disabled: false
     }
   ];
 
@@ -36,12 +39,16 @@ export function MobileNavigation() {
           {navItems.map((item) => (
             <button
               key={item.label}
-              onClick={() => navigate(item.href)}
+              onClick={() => {
+                if (!item.disabled) navigate(item.href);
+              }}
               className={cn(
                 "py-3 flex flex-col items-center justify-center flex-1",
-                item.active ? "text-expense" : "text-gray-500"
+                item.active ? "text-expense" : "text-gray-500",
+                item.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
               )}
-              disabled={item.label !== "Home" && item.label !== "Settings" && !currentGroupId}
+              disabled={item.disabled}
+              aria-label={item.label}
             >
               <item.icon size={20} />
               <span className="text-xs mt-1">{item.label}</span>
