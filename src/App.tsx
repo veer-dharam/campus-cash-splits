@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,7 @@ import CreateGroupPage from "./pages/CreateGroupPage";
 import AddExpensePage from "./pages/AddExpensePage";
 import BalancesPage from "./pages/BalancesPage";
 import NotFound from "./pages/NotFound";
+import SettingsPage from "./pages/SettingsPage";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +27,7 @@ const App = () => (
             <Route path="/groups/:groupId" element={<GroupPage />} />
             <Route path="/groups/:groupId/expenses/add" element={<AddExpensePage />} />
             <Route path="/groups/:groupId/balances" element={<BalancesPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>

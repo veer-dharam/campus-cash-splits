@@ -1,6 +1,5 @@
-
 import { useNavigate } from "react-router-dom";
-import { Home, Users, DollarSign, PieChart } from "lucide-react";
+import { Home, Users, DollarSign, PieChart, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useApp } from "@/context/AppContext";
 
@@ -32,6 +31,12 @@ export function MobileNavigation() {
       icon: PieChart,
       href: currentGroupId ? `/groups/${currentGroupId}/balances` : "/",
       active: window.location.pathname.includes("/balances")
+    },
+    {
+      label: "Settings",
+      icon: Settings,
+      href: "/settings",
+      active: window.location.pathname === "/settings"
     }
   ];
 
@@ -47,7 +52,7 @@ export function MobileNavigation() {
                 "py-3 flex flex-col items-center justify-center flex-1",
                 item.active ? "text-expense" : "text-gray-500"
               )}
-              disabled={item.label !== "Home" && !currentGroupId}
+              disabled={item.label !== "Home" && item.label !== "Settings" && !currentGroupId}
             >
               <item.icon size={20} />
               <span className="text-xs mt-1">{item.label}</span>
