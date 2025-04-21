@@ -14,7 +14,7 @@ import { ExpenseSummary } from "@/components/expenses/ExpenseSummary";
 export function GroupDetails() {
   const navigate = useNavigate();
   const { groupId } = useParams<{ groupId: string }>();
-  const { groups, currentUser } = useApp();
+  const { groups, currentUser, addUserToGroup } = useApp();
   
   const group = groups.find(g => g.id === groupId);
   const [addDialog, setAddDialog] = useState(false);
@@ -34,9 +34,9 @@ export function GroupDetails() {
   };
 
   const handleAddMember = (user: User) => {
-    setMembers((old) =>
-      old.some((m) => m.name === user.name) ? old : [...old, user]
-    );
+    if (groupId) {
+      addUserToGroup(groupId, user);
+    }
   };
 
   return (
