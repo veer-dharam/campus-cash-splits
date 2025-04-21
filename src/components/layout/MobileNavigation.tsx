@@ -1,30 +1,19 @@
+
 import { useNavigate } from "react-router-dom";
-import { Home, Users, DollarSign, PieChart, Settings } from "lucide-react";
+import { Home, PieChart, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useApp } from "@/context/AppContext";
 
 export function MobileNavigation() {
   const navigate = useNavigate();
   const { currentGroupId } = useApp();
-  
+
   const navItems = [
     {
       label: "Home",
       icon: Home,
       href: "/",
       active: window.location.pathname === "/"
-    },
-    {
-      label: "Group",
-      icon: Users,
-      href: currentGroupId ? `/groups/${currentGroupId}` : "/",
-      active: window.location.pathname.includes("/groups/")
-    },
-    {
-      label: "Expenses",
-      icon: DollarSign,
-      href: currentGroupId ? `/groups/${currentGroupId}/expenses/add` : "/",
-      active: window.location.pathname.includes("/expenses/add")
     },
     {
       label: "Balances",
