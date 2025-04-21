@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { User } from "@/types";
 
 interface AddMemberDialogProps {
@@ -29,21 +30,29 @@ export function AddMemberDialog({ open, onOpenChange, onAdd }: AddMemberDialogPr
         <DialogHeader>
           <DialogTitle>Add Member</DialogTitle>
         </DialogHeader>
-        <Input
-          label="Name"
-          placeholder="Member Name"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          autoFocus
-        />
-        <Input
-          label="Email"
-          placeholder="Member Email (optional)"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              placeholder="Member Name"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              autoFocus
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              placeholder="Member Email (optional)"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </div>
+        </div>
         <DialogFooter>
-          <Button onClick={handleAdd} disabled={!name.trim()} variant="primary">
+          <Button onClick={handleAdd} disabled={!name.trim()}>
             Add
           </Button>
         </DialogFooter>

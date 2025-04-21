@@ -1,7 +1,7 @@
-
 export interface User {
   id: string;
   name: string;
+  email?: string; // Make it optional since not all existing users will have an email
 }
 
 export interface Expense {

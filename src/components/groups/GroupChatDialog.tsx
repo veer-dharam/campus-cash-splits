@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { User, Group } from "@/types";
 import { useState, useRef, useEffect } from "react";
-import { Users, Send, User as UserIcon } from "lucide-react";
+import { Users, Send } from "lucide-react";
 
 interface GroupChatDialogProps {
   open: boolean;
@@ -40,8 +40,6 @@ export function GroupChatDialog({ open, onOpenChange, currentUser, group }: Grou
     }]);
     setInput("");
   };
-
-  if (!group) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -86,7 +84,7 @@ export function GroupChatDialog({ open, onOpenChange, currentUser, group }: Grou
             }}
             className="flex-1"
           />
-          <Button variant="secondary" size="icon" onClick={sendMessage} disabled={!input.trim()}>
+          <Button size="icon" onClick={sendMessage} disabled={!input.trim()}>
             <Send size={18} />
           </Button>
         </DialogFooter>
