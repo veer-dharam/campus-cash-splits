@@ -1,28 +1,37 @@
 
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useApp } from "@/context/AppContext";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AddMemberDialog } from "./AddMemberDialog";
 import { GroupMembers } from "./GroupMembers";
 import { Button } from "@/components/ui/button";
-import { UserPlus, Users } from "lucide-react";
+import { UserPlus, Users, PlusCircle } from "lucide-react";
 import { GroupChatDialog } from "./GroupChatDialog";
 import { User } from "@/types";
-
-const DEFAULT_USER: User = { id: "me", name: "You" };
-// Mock group data for the group chat - in a real app this would come from a context or API
-const MOCK_GROUP = {
-  id: "group-1",
-  name: "Current Group",
-  members: [DEFAULT_USER],
-  expenses: [],
-  createdAt: new Date().toISOString()
-};
+import { ExpenseSummary } from "@/components/expenses/ExpenseSummary";
 
 export function GroupDetails() {
-  // For demo: state in local. For production, use backend/store.
-  const [members, setMembers] = useState<User[]>([DEFAULT_USER]);
+  const navigate = useNavigate();
+  const { groupId } = useParams<{ groupId: string }>();
+  const { groups, currentUser } = useApp();
+  
+  const group = groups.find(g => g.id === groupId);
   const [addDialog, setAddDialog] = useState(false);
   const [groupChatOpen, setGroupChatOpen] = useState(false);
+
+  if (!group) {
+    return (
+      <div className="p-4">
+        <h2 className="text-lg font-semibold mb-2">Group not found</h2>
+        <Button onClick={() => navigate('/')}>Back to Home</Button>
+      </div>
+    );
+  }
+
+  const handleAddExpense = () => {
+    navigate(`/groups/${groupId}/expenses/add`);
+  };
 
   const handleAddMember = (user: User) => {
     setMembers((old) =>
@@ -33,7 +42,7 @@ export function GroupDetails() {
   return (
     <>
       <PageHeader
-        title="Group"
+        title={group.name}
         actions={
           <div className="flex gap-2">
             <Button
@@ -55,9 +64,24 @@ export function GroupDetails() {
           </div>
         }
       />
-      <div className="p-4">
-        <GroupMembers members={members} currentUser={DEFAULT_USER} />
+      <div className="p-4 space-y-6 pb-20">
+        <GroupMembers members={group.members} currentUser={currentUser} />
+        
+        <ExpenseSummary />
+        
+        <div className="fixed bottom-16 right-4 z-10">
+          <Button
+            size="lg"
+            variant="expense"
+            className="rounded-full shadow-lg"
+            onClick={handleAddExpense}
+          >
+            <PlusCircle className="mr-1" />
+            Add Expense
+          </Button>
+        </div>
       </div>
+      
       <AddMemberDialog
         open={addDialog}
         onOpenChange={setAddDialog}
@@ -66,8 +90,8 @@ export function GroupDetails() {
       <GroupChatDialog 
         open={groupChatOpen} 
         onOpenChange={setGroupChatOpen}
-        currentUser={DEFAULT_USER}
-        group={MOCK_GROUP}
+        currentUser={currentUser}
+        group={group}
       />
     </>
   );
