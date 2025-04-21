@@ -4,14 +4,21 @@ import { useApp } from "@/context/AppContext";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { calculateTotalSpent, calculateUserBalance, formatCurrency } from "@/lib/utils/expense";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 export function GroupDetails() {
   const { groupId } = useParams<{ groupId: string }>();
-  const { groups, currentUser, setCurrentGroup } = useApp();
+  const { groups, currentUser, setCurrentGroup, addUserToGroup } = useApp();
   const navigate = useNavigate();
-  
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [newMemberName, setNewMemberName] = useState("");
+  const [addError, setAddError] = useState("");
+
   const group = groups.find(g => g.id === groupId);
   
   if (!group) {
@@ -22,16 +29,16 @@ export function GroupDetails() {
       </div>
     );
   }
-  
+
   setCurrentGroup(group.id);
-  
+
   const totalSpent = calculateTotalSpent(group);
   const userBalance = calculateUserBalance(group, currentUser.id);
-  
+
   const handleAddExpense = () => {
     navigate(`/groups/${group.id}/expenses/add`);
   };
-  
+
   const renderExpenseItem = (description: string, index: number) => {
     const expense = group.expenses.find(e => e.description === description);
     if (!expense) return null;
@@ -49,12 +56,75 @@ export function GroupDetails() {
       </div>
     );
   };
-  
+
+  const handleMemberAdd = () => {
+    const name = newMemberName.trim();
+    if (!name) {
+      setAddError("Name required");
+      return;
+    }
+    if (group.members.some(m => m.name.toLowerCase() === name.toLowerCase())) {
+      setAddError("Member already exists");
+      return;
+    }
+    addUserToGroup(group.id, {
+      id: `member-${Date.now()}`,
+      name,
+    });
+    setNewMemberName("");
+    setAddError("");
+    setAddDialogOpen(false);
+  };
+
   return (
     <>
       <PageHeader 
         title={group.name} 
         backTo="/"
+        actions={
+          <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="gap-1"
+                title="Add Member"
+              >
+                <UserPlus size={18} />
+                Add Member
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add Member</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3">
+                <Label htmlFor="member-name">Member Name</Label>
+                <Input
+                  id="member-name"
+                  value={newMemberName}
+                  onChange={e => {
+                    setNewMemberName(e.target.value);
+                    setAddError("");
+                  }}
+                  placeholder="Enter a name"
+                  autoFocus
+                />
+                {addError && <div className="text-sm text-red-500">{addError}</div>}
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="expense"
+                  className="w-full"
+                  onClick={handleMemberAdd}
+                  disabled={newMemberName.trim() === ""}
+                >
+                  Add
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        }
       />
       
       <div className="p-4">
@@ -77,6 +147,17 @@ export function GroupDetails() {
                   : "All settled up"}
             </p>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <h3 className="text-sm text-muted-foreground font-semibold mb-1">Members</h3>
+          <ul className="flex flex-wrap gap-2 mb-2">
+            {group.members.map(member => (
+              <li key={member.id} className="bg-gray-100 px-3 py-1 rounded text-sm">
+                {member.name}
+              </li>
+            ))}
+          </ul>
         </div>
         
         <div className="mb-4">
