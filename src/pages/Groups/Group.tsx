@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -210,7 +211,9 @@ const Group = () => {
                         Paid by {expense.paidBy}
                       </span>
                       <span className="text-sm text-muted-foreground block">
-                        Split between: {expense.splitBetween.join(', ')}
+                        Split between: {expense.splitBetween && expense.splitBetween.length > 0 
+                          ? expense.splitBetween.join(', ') 
+                          : 'No members selected'}
                       </span>
                     </div>
                     <span className="text-muted-foreground">₹{expense.amount}</span>
@@ -261,38 +264,46 @@ const Group = () => {
                     value={newExpense.paidBy}
                     onChange={(e) => setNewExpense({ ...newExpense, paidBy: e.target.value })}
                   >
-                    {group.members.map((member) => (
-                      <option key={member} value={member}>
-                        {member}
-                      </option>
-                    ))}
+                    {group.members && group.members.length > 0 ? (
+                      group.members.map((member) => (
+                        <option key={member} value={member}>
+                          {member}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="You">You</option>
+                    )}
                   </select>
                 </div>
                 <div className="space-y-2">
                   <Label>Split Between</Label>
                   <div className="space-y-2">
-                    {group.members.map((member) => (
-                      <div key={member} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`member-${member}`}
-                          checked={newExpense.splitBetween.includes(member)}
-                          onCheckedChange={(checked) => {
-                            setNewExpense({
-                              ...newExpense,
-                              splitBetween: checked
-                                ? [...newExpense.splitBetween, member]
-                                : newExpense.splitBetween.filter((m) => m !== member)
-                            });
-                          }}
-                        />
-                        <label
-                          htmlFor={`member-${member}`}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {member}
-                        </label>
-                      </div>
-                    ))}
+                    {group.members && group.members.length > 0 ? (
+                      group.members.map((member) => (
+                        <div key={member} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`member-${member}`}
+                            checked={newExpense.splitBetween.includes(member)}
+                            onCheckedChange={(checked) => {
+                              setNewExpense({
+                                ...newExpense,
+                                splitBetween: checked
+                                  ? [...newExpense.splitBetween, member]
+                                  : newExpense.splitBetween.filter((m) => m !== member)
+                              });
+                            }}
+                          />
+                          <label
+                            htmlFor={`member-${member}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {member}
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No members available to split with.</p>
+                    )}
                   </div>
                 </div>
                 <Button className="w-full" onClick={handleAddExpense}>
