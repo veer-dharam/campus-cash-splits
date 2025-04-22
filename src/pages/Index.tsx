@@ -1,12 +1,28 @@
 
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Home, Plus, Users } from "lucide-react";
 import { TopNav } from "@/components/NavigationMenu";
 import { useNavigate } from "react-router-dom";
 
+interface Group {
+  id: string;
+  name: string;
+  description: string;
+  members: string[];
+  createdAt: string;
+}
+
 const Index = () => {
   const navigate = useNavigate();
+  const [groups, setGroups] = useState<Group[]>([]);
+
+  // Load groups from localStorage on component mount
+  useEffect(() => {
+    const storedGroups = JSON.parse(localStorage.getItem('groups') || '[]');
+    setGroups(storedGroups);
+  }, []);
 
   const handleCreateGroup = () => {
     navigate("/groups/new");
@@ -61,25 +77,33 @@ const Index = () => {
           {/* Recent Groups */}
           <div className="w-full mt-8">
             <h2 className="text-xl font-semibold mb-4">Recent Groups</h2>
-            <div className="grid grid-cols-1 gap-4">
-              <Card className="group bg-card hover:bg-accent transition-all duration-300">
-                <CardContent className="p-6">
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start group-hover:text-accent-foreground"
-                    onClick={() => navigate("/groups/1")}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <Home className="h-5 w-5" />
-                      <div className="text-left">
-                        <h3 className="font-medium">Apartment Expenses</h3>
-                        <p className="text-sm text-muted-foreground">4 members</p>
-                      </div>
-                    </div>
-                  </Button>
-                </CardContent>
+            {groups.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4">
+                {groups.map((group) => (
+                  <Card key={group.id} className="group bg-card hover:bg-accent transition-all duration-300">
+                    <CardContent className="p-6">
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start group-hover:text-accent-foreground"
+                        onClick={() => navigate(`/groups/${group.id}`)}
+                      >
+                        <div className="flex items-center space-x-4">
+                          <Home className="h-5 w-5" />
+                          <div className="text-left">
+                            <h3 className="font-medium">{group.name}</h3>
+                            <p className="text-sm text-muted-foreground">{group.members.length} members</p>
+                          </div>
+                        </div>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card className="p-6 text-center text-muted-foreground">
+                <p>No groups created yet. Create your first group to get started!</p>
               </Card>
-            </div>
+            )}
           </div>
         </div>
       </div>

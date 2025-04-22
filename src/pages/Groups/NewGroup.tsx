@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,19 +7,71 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { TopNav } from '@/components/NavigationMenu';
+import { useToast } from "@/hooks/use-toast";
 
 interface NewGroupForm {
   groupName: string;
   description: string;
 }
 
+// Define a Group type to store in localStorage
+interface Group {
+  id: string;
+  name: string;
+  description: string;
+  members: string[];
+  createdAt: string;
+}
+
 const NewGroup = () => {
   const navigate = useNavigate();
-  const { register, handleSubmit } = useForm<NewGroupForm>();
+  const { register, handleSubmit, formState: { errors } } = useForm<NewGroupForm>();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = (data: NewGroupForm) => {
-    console.log('New group data:', data);
-    navigate('/groups/' + Math.random().toString(36).substr(2, 9));
+    setIsSubmitting(true);
+    
+    try {
+      // Generate a unique ID for the group
+      const groupId = Math.random().toString(36).substring(2, 11);
+      
+      // Create new group object
+      const newGroup: Group = {
+        id: groupId,
+        name: data.groupName,
+        description: data.description || "",
+        members: ["You"], // Default member is the current user
+        createdAt: new Date().toISOString(),
+      };
+      
+      // Get existing groups from localStorage or initialize empty array
+      const existingGroups = JSON.parse(localStorage.getItem('groups') || '[]');
+      
+      // Add new group to the array
+      const updatedGroups = [...existingGroups, newGroup];
+      
+      // Save updated groups array back to localStorage
+      localStorage.setItem('groups', JSON.stringify(updatedGroups));
+      
+      // Show success toast
+      toast({
+        title: "Group Created",
+        description: `"${data.groupName}" has been created successfully.`,
+      });
+      
+      // Navigate to the new group page
+      navigate(`/groups/${groupId}`);
+    } catch (error) {
+      console.error("Error creating group:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create group. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -38,10 +90,13 @@ const NewGroup = () => {
                 <Label htmlFor="groupName">Group Name</Label>
                 <Input
                   id="groupName"
-                  {...register("groupName", { required: true })}
+                  {...register("groupName", { required: "Group name is required" })}
                   className="w-full transition-colors hover:border-primary/50 focus:border-primary"
                   placeholder="Enter group name"
                 />
+                {errors.groupName && (
+                  <p className="text-sm text-red-500">{errors.groupName.message}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Description (Optional)</Label>
@@ -63,9 +118,10 @@ const NewGroup = () => {
                 </Button>
                 <Button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full bg-primary hover:bg-primary/90 transition-all duration-300"
                 >
-                  Create Group
+                  {isSubmitting ? "Creating..." : "Create Group"}
                 </Button>
               </div>
             </form>
