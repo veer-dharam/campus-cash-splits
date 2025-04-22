@@ -9,6 +9,9 @@ import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import NewGroup from "./pages/Groups/NewGroup";
+import Group from "./pages/Groups/Group";
+import AddExpense from "./pages/Expenses/AddExpense";
+import Balances from "./pages/Balances/Balances";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -24,10 +27,9 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/groups/new" element={<NewGroup />} />
-              <Route path="/groups/join" element={<NotFound />} />
-              <Route path="/groups/:id" element={<NotFound />} />
-              <Route path="/expenses" element={<NotFound />} />
-              <Route path="/balances" element={<NotFound />} />
+              <Route path="/groups/:id" element={<Group />} />
+              <Route path="/expenses/new" element={<AddExpense />} />
+              <Route path="/balances" element={<Balances />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
