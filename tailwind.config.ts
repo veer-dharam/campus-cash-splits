@@ -52,24 +52,6 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-        expense: {
-          DEFAULT: '#4F46E5', // Indigo primary color
-          foreground: '#FFFFFF',
-          muted: '#818CF8', // Lighter indigo
-          hover: '#4338CA' // Darker indigo for hover states
-        },
-        success: {
-          DEFAULT: '#10B981', // Green for positive balances
-          foreground: '#FFFFFF'
-        },
-        warning: {
-          DEFAULT: '#F59E0B', // Amber for pending transactions
-          foreground: '#FFFFFF'
-        },
-        debt: {
-          DEFAULT: '#EF4444', // Red for negative balances/debts
-          foreground: '#FFFFFF'
-        },
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
