@@ -12,7 +12,7 @@ import NewGroup from "./pages/Groups/NewGroup";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClient Provider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="dark" attribute="class">
       <TooltipProvider>
         <Toaster />
