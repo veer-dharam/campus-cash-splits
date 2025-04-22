@@ -7,11 +7,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import NewGroup from "./pages/Groups/NewGroup";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <QueryClient Provider client={queryClient}>
     <ThemeProvider defaultTheme="dark" attribute="class">
       <TooltipProvider>
         <Toaster />
@@ -20,7 +21,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/groups/new" element={<NotFound />} />
+              <Route path="/groups/new" element={<NewGroup />} />
               <Route path="/groups/join" element={<NotFound />} />
               <Route path="/groups/:id" element={<NotFound />} />
               <Route path="/expenses" element={<NotFound />} />
