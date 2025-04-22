@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { TopNav } from '@/components/NavigationMenu';
 import { GroupHeader } from '@/components/groups/GroupHeader';
 import { MemberManagement } from '@/components/groups/MemberManagement';
@@ -11,6 +11,7 @@ import { useGroup } from '@/hooks/useGroup';
 
 const Group = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const {
     group,
     loading,
