@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ExpenseForm } from '@/components/expenses/ExpenseForm';
 import { ExpenseCard } from '@/components/expenses/ExpenseCard';
 import { GroupHeader } from '@/components/groups/GroupHeader';
+import { MemberManagement } from '@/components/groups/MemberManagement';
+import { ChatSystem } from '@/components/groups/ChatSystem';
 
 interface Expense {
   id: string;
@@ -98,6 +100,28 @@ const Group = () => {
     }
   };
 
+  const handleAddMember = (newMember: string) => {
+    if (group) {
+      const updatedGroup = {
+        ...group,
+        members: [...group.members, newMember]
+      };
+      
+      const storedGroups = JSON.parse(localStorage.getItem('groups') || '[]');
+      const updatedGroups = storedGroups.map((g: Group) => 
+        g.id === id ? updatedGroup : g
+      );
+      
+      localStorage.setItem('groups', JSON.stringify(updatedGroups));
+      setGroup(updatedGroup);
+      
+      toast({
+        title: "Member Added",
+        description: `${newMember} has been added to the group.`,
+      });
+    }
+  };
+
   const handleAddExpense = () => {
     if (!newExpense.title || !newExpense.amount || newExpense.splitBetween.length === 0) {
       toast({
@@ -167,6 +191,16 @@ const Group = () => {
               <span className="text-xl font-semibold">₹{totalSpent}</span>
             </div>
           </Card>
+
+          <MemberManagement 
+            members={group.members} 
+            onAddMember={handleAddMember} 
+          />
+
+          <ChatSystem 
+            groupId={group.id} 
+            members={group.members} 
+          />
 
           <div className="space-y-4">
             <div className="flex justify-between items-center">
