@@ -8,19 +8,16 @@ import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { TopNav } from '@/components/NavigationMenu';
 import { useToast } from "@/hooks/use-toast";
+import { Plus, X } from 'lucide-react';
 
 interface NewGroupForm {
   groupName: string;
   description: string;
 }
 
-// Define a Group type to store in localStorage
-interface Group {
-  id: string;
+interface Member {
   name: string;
-  description: string;
-  members: string[];
-  createdAt: string;
+  id: string;
 }
 
 const NewGroup = () => {
@@ -28,39 +25,46 @@ const NewGroup = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<NewGroupForm>();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [members, setMembers] = useState<Member[]>([{ name: 'You', id: 'user-1' }]);
+  const [newMember, setNewMember] = useState('');
+
+  const addMember = () => {
+    if (newMember.trim()) {
+      setMembers([...members, { 
+        name: newMember.trim(), 
+        id: `member-${Date.now()}`
+      }]);
+      setNewMember('');
+    }
+  };
+
+  const removeMember = (id: string) => {
+    setMembers(members.filter(member => member.id !== id));
+  };
 
   const onSubmit = (data: NewGroupForm) => {
     setIsSubmitting(true);
     
     try {
-      // Generate a unique ID for the group
       const groupId = Math.random().toString(36).substring(2, 11);
       
-      // Create new group object
-      const newGroup: Group = {
+      const newGroup = {
         id: groupId,
         name: data.groupName,
         description: data.description || "",
-        members: ["You"], // Default member is the current user
+        members: members.map(m => m.name),
         createdAt: new Date().toISOString(),
       };
       
-      // Get existing groups from localStorage or initialize empty array
       const existingGroups = JSON.parse(localStorage.getItem('groups') || '[]');
-      
-      // Add new group to the array
       const updatedGroups = [...existingGroups, newGroup];
-      
-      // Save updated groups array back to localStorage
       localStorage.setItem('groups', JSON.stringify(updatedGroups));
       
-      // Show success toast
       toast({
         title: "Group Created",
         description: `"${data.groupName}" has been created successfully.`,
       });
       
-      // Navigate to the new group page
       navigate(`/groups/${groupId}`);
     } catch (error) {
       console.error("Error creating group:", error);
@@ -78,9 +82,9 @@ const NewGroup = () => {
     <div className="min-h-screen bg-background">
       <TopNav />
       <div className="container max-w-2xl mx-auto px-4 py-8">
-        <Card className="w-full bg-card/50 backdrop-blur-sm border border-border/50 animate-fade-in">
+        <Card className="w-full bg-card/50 backdrop-blur-sm border border-border/50">
           <CardHeader>
-            <CardTitle className="text-2xl font-semibold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+            <CardTitle className="text-2xl font-semibold">
               Create a New Group
             </CardTitle>
           </CardHeader>
@@ -91,35 +95,75 @@ const NewGroup = () => {
                 <Input
                   id="groupName"
                   {...register("groupName", { required: "Group name is required" })}
-                  className="w-full transition-colors hover:border-primary/50 focus:border-primary"
+                  className="w-full"
                   placeholder="Enter group name"
                 />
                 {errors.groupName && (
-                  <p className="text-sm text-red-500">{errors.groupName.message}</p>
+                  <p className="text-sm text-destructive">{errors.groupName.message}</p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="description">Description (Optional)</Label>
                 <Input
                   id="description"
                   {...register("description")}
-                  className="w-full transition-colors hover:border-primary/50 focus:border-primary"
+                  className="w-full"
                   placeholder="Enter group description"
                 />
               </div>
+
+              <div className="space-y-4">
+                <Label>Members</Label>
+                <div className="flex flex-wrap gap-2">
+                  {members.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full"
+                    >
+                      <span>{member.name}</span>
+                      {member.name !== 'You' && (
+                        <button
+                          type="button"
+                          onClick={() => removeMember(member.id)}
+                          className="text-destructive hover:text-destructive/80"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add member name"
+                    value={newMember}
+                    onChange={(e) => setNewMember(e.target.value)}
+                    className="w-full"
+                  />
+                  <Button
+                    type="button"
+                    onClick={addMember}
+                    variant="outline"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
               <div className="flex gap-4 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => navigate('/')}
-                  className="w-full hover:bg-background/50 transition-all duration-300"
+                  className="w-full"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-primary hover:bg-primary/90 transition-all duration-300"
+                  className="w-full"
                 >
                   {isSubmitting ? "Creating..." : "Create Group"}
                 </Button>
